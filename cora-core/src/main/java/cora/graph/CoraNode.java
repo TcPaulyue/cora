@@ -104,6 +104,14 @@ public class CoraNode {
         this.cache = cache;
     }
 
+    public FSM getFsm() {
+        return fsm;
+    }
+
+    public void setFsm(FSM fsm) {
+        this.fsm = fsm;
+    }
+
 
     public static final class Builder {
         private String name;
