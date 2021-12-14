@@ -1,11 +1,11 @@
 package cora.graph;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import cora.graph.coraCache.CacheElement;
 import cora.graph.coraCache.CacheKey;
-import graphql.execution.ResultPath;
+import cora.graph.fsm.FSM;
+import cora.graph.fsm.impl.FSMImpl;
 import graphql.language.*;
 
 import java.util.ArrayList;
@@ -22,10 +22,11 @@ public class CoraNode {
     private Map<String, Type> inputTypeMap;
     private Map<String, Type> linkedTypeMap;
     private Cache<CacheKey, CacheElement> cache;
-
     private List<String> children;
+    private FSM fsm;
 
-    public CoraNode(String name, Definition definition, Map<String, Type> typeMap, Map<String, Type> inputTypeMap, Map<String, Type> linkedTypeMap, Cache<CacheKey, CacheElement> cache, List<String> children) {
+
+    public CoraNode(String name, Definition definition, Map<String, Type> typeMap, Map<String, Type> inputTypeMap, Map<String, Type> linkedTypeMap, Cache<CacheKey, CacheElement> cache, List<String> children, FSM fsm) {
         this.name = name;
         this.definition = definition;
         this.typeMap = typeMap;
@@ -33,6 +34,7 @@ public class CoraNode {
         this.linkedTypeMap = linkedTypeMap;
         this.cache = cache;
         this.children = children;
+        this.fsm = fsm;
     }
 
     public Map<String, Type> getLinkedTypeMap() {
@@ -114,6 +116,9 @@ public class CoraNode {
 
         private List<String> children = new ArrayList<>();
 
+        //todo: finite state machine
+        private FSM fsm = new FSMImpl(new HashMap<>());
+
         private Cache<CacheKey, CacheElement> cache = Caffeine.newBuilder()
                 .maximumSize(10).expireAfterWrite(10, TimeUnit.MINUTES).build();
 
@@ -150,7 +155,7 @@ public class CoraNode {
         }
 
         public CoraNode build() {
-            return new CoraNode(name, definition, typeMap, inputTypeMap, linkedTypeMap,cache, children);
+            return new CoraNode(name, definition, typeMap, inputTypeMap, linkedTypeMap,cache, children, fsm);
         }
 
         public String getName() {

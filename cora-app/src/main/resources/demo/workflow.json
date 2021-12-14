@@ -4,7 +4,7 @@
     "start": {
       "name": "startNode",
       "desc": "提交请假单",
-      "coraNode": "leave",
+      "coraNode": "leaveType",
       "nextNode": {
           "submit": "review",
           "cancel":"start",
@@ -14,7 +14,7 @@
     "review": {
       "name": "reviewNode",
       "desc": "审批请假单",
-      "coraNode": "review",
+      "coraNode": "reviewType",
       "nextNode": {
         "pass": "end",
         "reject": "end"

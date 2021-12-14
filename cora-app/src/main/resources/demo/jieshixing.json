@@ -11,6 +11,24 @@
         "type": "string",
         "title": "名称"
       }
+    },
+    "states": {
+      "created": {
+        "auth": ["a","b","c"],
+        "fields": ["name"],
+        "executeStatement": {
+          "inputs": [],
+          "code": "",
+          "output":[
+            "modify","save"
+          ]
+        },
+        "next_state": ["modify", "created"]
+      },
+      "modify": {
+        "auth": ["a","b","c"],
+        "fields": ["name"]
+      }
     }
   },
   "customerExpense": {

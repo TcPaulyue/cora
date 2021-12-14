@@ -11,8 +11,8 @@ public class GQLTemplate {
     //input filter of string field
     private static final List<String> filter_items_in_query_list_for_string = Arrays.asList("_eq","_neq");
 
+    //input filter of int field
     private static final List<String> filter_items_in_query_list_for_int = Arrays.asList("_eq","_neq","_gt","_lt");
-
 
     //filter definition for each field("_eq","_neq","_gt","_lt"...)
     //input type filters for every string field in type
