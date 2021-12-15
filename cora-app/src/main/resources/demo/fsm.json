@@ -1,0 +1,46 @@
+{
+  "name": "fsmdemo",
+  "events": [
+    {
+      "name": "EventOne",
+      "type": "..."
+    },
+    {
+      "name": "EventTwo",
+      "type": "..."
+    }
+  ],
+  "types": ["typeA","typeB","typeC"],
+  "transitions":[
+    {
+      "event": "EventOne",
+      "trans": [
+        {
+          "type": "typeA",
+          "from": "stateOne",
+          "to": "stateTwo"
+        },
+        {
+          "type": "typeB",
+          "from": "stateOne",
+          "to": "stateTwo"
+        }
+      ]
+    },
+    {
+      "event": "EventTwo",
+      "trans": [
+        {
+          "type": "typeA",
+          "from": "stateTwo",
+          "to": "stateOne"
+        },
+        {
+          "type": "typeB",
+          "from": "stateTwo",
+          "to": "stateOne"
+        }
+      ]
+    }
+  ]
+}

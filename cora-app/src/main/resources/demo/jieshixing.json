@@ -12,23 +12,21 @@
         "title": "名称"
       }
     },
-    "states": {
-      "created": {
-        "auth": ["a","b","c"],
-        "fields": ["name"],
-        "executeStatement": {
-          "inputs": [],
-          "code": "",
-          "output":[
-            "modify","save"
-          ]
+    "fsm": {
+      "state": ["a","b","c"],
+      "initial": "a",
+      "transitions": [
+        {
+          "event": "a2b",
+          "from": "a",
+          "to": "b"
         },
-        "next_state": ["modify", "created"]
-      },
-      "modify": {
-        "auth": ["a","b","c"],
-        "fields": ["name"]
-      }
+        {
+          "event": "b2c",
+          "from": "b",
+          "to": "c"
+        }
+      ]
     }
   },
   "customerExpense": {

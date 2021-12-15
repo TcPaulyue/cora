@@ -39,4 +39,17 @@ public class SDLParser extends Parser implements CoraParser {
         return customIngress;
     }
 
+    //todo rebuild
+    public Boolean isStateModifiedSchema(String schema){
+        Document document = super.parseDocument(schema);
+        OperationDefinition operationDefinition = (OperationDefinition) document.getDefinitions().get(0);
+        Field field = (Field) operationDefinition.getSelectionSet().getSelections().get(0);
+        for(Argument argument:field.getArguments()){
+            if(StringUtils.equals(argument.getName(),"event")){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
