@@ -14,11 +14,6 @@ public class FSMImpl implements FSM {
         this.fsmMap = fsmMap;
     }
 
-    @Override
-    public Map<Event, State> nextExecution(State state) {
-        return fsmMap.get(state);
-    }
-
 
     public Map<State, Map<Event, State>> getFsmMap() {
         return fsmMap;
@@ -26,5 +21,10 @@ public class FSMImpl implements FSM {
 
     public void setFsmMap(Map<State, Map<Event, State>> fsmMap) {
         this.fsmMap = fsmMap;
+    }
+
+    @Override
+    public State nextState(State state, Event event) {
+        return fsmMap.get(state).get(event);
     }
 }

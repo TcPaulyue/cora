@@ -2,6 +2,7 @@ package cora.parser.dsl;
 
 
 import cora.graph.CustomIngress;
+import cora.graph.fsm.FSM;
 import cora.parser.dsl.CoraParser;
 import graphql.language.*;
 import graphql.parser.Parser;
@@ -14,6 +15,11 @@ public class SDLParser extends Parser implements CoraParser {
     @Override
     public List<Definition> parseSchema(String schema) {
         return super.parse(schema).getDefinitions();
+    }
+
+    @Override
+    public FSM parseFSM(String fsm) {
+        return null;
     }
 
     @Override

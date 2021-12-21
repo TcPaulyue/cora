@@ -21,7 +21,7 @@ public class IngressTemplate {
         map.put("nodeType",StringUtil.lowerCase(nodeType));
         map.put("id",id);
         map.put("state",state);
-        return VelocityTemplate.build(queryStateTemplate,map);
+        return VelocityTemplate.build(updateStateTemplate,map);
     }
 
     public static String getQueryStateTemplate(String nodeType,String id){

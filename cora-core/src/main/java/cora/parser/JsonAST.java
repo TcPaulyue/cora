@@ -5,12 +5,12 @@ import cora.antlr.json.JSONParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JsonAST {
-
-
 
     private Map<String, Object> map;
 
@@ -41,6 +41,20 @@ public class JsonAST {
             map.put(key, newValue.substring(1, newValue.length() - 1));
         }
         return (String) map.get(key);
+    }
+
+    public String[] getStringList(String key){
+        Object value = map.get(key);
+        if (value == null || "".equals(value)) {
+            return null;
+        }
+        if (JSONParser.ValueContext.class.isInstance(value)) {
+            JSONParser.ValueContext ctx = (JSONParser.ValueContext) value;
+            String newValue = ctx.arr().getText();
+            map.put(key, newValue);
+        }
+        String s = (String)map.get(key);
+        return s.substring(1, s.lastIndexOf("]")).split(",");
     }
 
     public int getInt(String key) {

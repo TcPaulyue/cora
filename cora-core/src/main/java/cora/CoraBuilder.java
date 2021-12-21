@@ -10,6 +10,7 @@ import cora.datafetcher.custom.CustomDataFetcher;
 import cora.graph.CoraGraph;
 import cora.graph.CoraNode;
 import cora.graph.CustomIngress;
+import cora.graph.fsm.FSM;
 import cora.groovy.GroovyScriptService;
 import cora.parser.dsl.CoraParser;
 import cora.parser.dsl.SDLParser;
@@ -117,6 +118,11 @@ public class CoraBuilder {
             List<Definition> parse = coraParser.parseSchema(schema);
             String nodeName = CoraGraph.merge(parse);
             this.addNewTypeAndDataFetcherInGraphQL(CoraGraph.getCoraNode(nodeName));
+            //fsm
+            if(!coraNode.getJSONObject("schemaDefinition").getString("fsm").isEmpty()){
+                FSM fsm = coraParser.parseFSM(coraNode.getJSONObject("schemaDefinition").getString("fsm"));
+                CoraGraph.addFsm(nodeName,fsm);
+            }
         });
         //this.graphNodeInitialization();
         coraTypeRegistry.buildTypeRegistry();

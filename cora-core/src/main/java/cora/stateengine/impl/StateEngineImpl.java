@@ -6,16 +6,15 @@ import cora.CoraBuilder;
 import cora.graph.CoraGraph;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.State;
+import cora.graph.fsm.impl.InputEvent;
 import cora.graph.fsm.impl.StateImpl;
 import cora.parser.dsl.CoraParser;
-import cora.parser.dsl.SDLParser;
+import cora.parser.dsl.JsonSchemaParser;
 import cora.stateengine.StateEngine;
 import cora.util.IngressTemplate;
 import cora.util.StringUtil;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-
-import java.util.Map;
 
 public class StateEngineImpl implements StateEngine {
     private CoraParser coraParser;
@@ -31,25 +30,29 @@ public class StateEngineImpl implements StateEngine {
     }
 
     @Override
-    public State execute(String query) {
-        SDLParser sdlParser = new SDLParser();
-        String id = "id";
-        String nodeType = "nodeType";
-        //getState
-        StateImpl state = (StateImpl) this.getState(nodeType,id);
+    public State execute(String input) {
+        JsonSchemaParser jsonSchemaParser = new JsonSchemaParser();
+        InputEvent event = (InputEvent) jsonSchemaParser.parseEvent(input);
+
         //if no event in query
-        if(!sdlParser.isStateModifiedSchema(query)){
-            ExecutionResult executeResult = graphQL.execute(query);
+        if(event == null){
+            ExecutionResult executeResult = graphQL.execute(input);
             String s = JSON.toJSONString(executeResult.getData());
+            StateImpl state = new StateImpl(null);
             state.setExecutionResult(s);
             return state;
         }
-        //else if event trigger
-        StateImpl nextState = (StateImpl) this.getNextState(state,"mutationTemplate");
-        //merge string
-        String updateState = IngressTemplate.getUpdateStateTemplate(nodeType,id,nextState.getStateDesc());
 
-        String merge = StringUtil.merge(query, updateState);
+        //getState
+        StateImpl state = (StateImpl) this.getState(event.getNodeType(), event.getId());
+
+        //if event trigger
+        StateImpl nextState = (StateImpl) this.getNextState(state,event);
+
+        //merge string
+        String updateState = IngressTemplate.getUpdateStateTemplate(event.getNodeType(),event.getId(),nextState.getStateDesc());
+        String merge = StringUtil.merge(input, updateState);
+
         ExecutionResult executeResult = graphQL.execute(merge);
         String s = JSON.toJSONString(executeResult.getData());
         nextState.setExecutionResult(s);
@@ -57,12 +60,8 @@ public class StateEngineImpl implements StateEngine {
         return nextState;
     }
 
-    public State getNextState(State state, String event) {
-        //todo getId
-        String id = "id";
-        String nodeType = "nodeType";
-        Map<Event, State> eventStateMap = CoraGraph.getCoraNode(nodeType).getFsm().nextExecution(state);
-        return null;
+    public State getNextState(State state, Event event) {
+        return CoraGraph.getCoraNode(((InputEvent)event).getNodeType()).getFsm().nextState(state, event);
     }
 
     public State getState(String nodeType,String id) {

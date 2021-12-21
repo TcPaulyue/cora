@@ -125,7 +125,7 @@ public class CoraNode {
         private List<String> children = new ArrayList<>();
 
         //todo: finite state machine
-        private FSM fsm = new FSMImpl(new HashMap<>());
+        private FSM fsm;
 
         private Cache<CacheKey, CacheElement> cache = Caffeine.newBuilder()
                 .maximumSize(10).expireAfterWrite(10, TimeUnit.MINUTES).build();
@@ -164,6 +164,14 @@ public class CoraNode {
 
         public CoraNode build() {
             return new CoraNode(name, definition, typeMap, inputTypeMap, linkedTypeMap,cache, children, fsm);
+        }
+
+        public FSM getFsm() {
+            return fsm;
+        }
+
+        public void setFsm(FSM fsm) {
+            this.fsm = fsm;
         }
 
         public String getName() {

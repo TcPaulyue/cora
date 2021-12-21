@@ -1,5 +1,7 @@
 package cora.graph;
 
+import cora.graph.fsm.FSM;
+import cora.parser.dsl.CoraParser;
 import graphql.language.Definition;
 import graphql.language.ObjectTypeDefinition;
 
@@ -23,6 +25,10 @@ public class CoraGraph {
         CoraIngress ingress = new CoraIngress.Builder(node.getName()).build();
         CoraIngressMap.put(node.getName(),ingress);
         return node.getName();
+    }
+
+    public static void addFsm(String nodeType,FSM fsm){
+        CoraNodeMap.get(nodeType).setFsm(fsm);
     }
 
     public static CoraNode getCoraNode(String nodeType){
