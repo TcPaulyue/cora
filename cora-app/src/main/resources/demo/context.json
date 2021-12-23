@@ -1,0 +1,59 @@
+{
+  "contextName": "demoContext",
+  "instances": ["TempSensor/instanceId01","AirPurifier/instanceId01"],
+  "onEvents": {
+    "TempSensor/instanceId01": [
+      {
+        "eventName": "update_temp",
+        "action": {
+          "codeSnippet": "if(temp < '22'){'a'}else if(temp > '22'){'b'}else{'c'}",
+          "output": {
+            "a": {
+              "publishEvent":{
+                "eventName": "speed_up",
+                "id": "AirPurifier/instanceId01",
+                "data": {
+                  "speed": "fast"
+                }
+              }
+            },
+            "b": {
+              "publishEvent":{
+                "eventName": "turn_off_airPurifier",
+                "id": "AirPurifier/instanceId01",
+                "data": {
+                  "isRunning": "no"
+                }
+              }
+            },
+            "c": ""
+          }
+        }
+      }
+    ],
+    "AirPurifier/instanceId01": [
+      {
+        "eventName":"turn_on_airPurifier",
+        "conditions":""
+      }
+    ]
+  },
+  "event": {
+    "eventName": "TempSensor/${id}/update_temp",
+    "data": {
+      "temp": "${temp}"
+    }
+  },
+  "event": {
+    "eventName": "AirPurifier/${id}/speed_up",
+    "data": {
+      "speed": "${speed}"
+    }
+  },
+  "event": {
+    "eventName": "AirPurifier/${id}/turn_off_airPurifier",
+    "data": {
+      "isRunning": "${isRunning}"
+    }
+  }
+}

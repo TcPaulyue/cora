@@ -1,45 +1,88 @@
 {
-  "fieldschema": {
-    "type": "object",
-    "nodeType": "TempSenor",
-    "properties": {
-      "lightId": {
-        "title": "编号",
-        "type": "string"
-      },
-      "temp": {
-        "type": "string",
-        "title": "温度"
-      },
-      "state": {
-        "type": "string",
-        "title": "状态"
+  "tempSenor":{
+    "fieldschema": {
+      "type": "object",
+      "nodeType": "TempSenor",
+      "properties": {
+        "sensorId": {
+          "title": "编号",
+          "type": "string"
+        },
+        "temp": {
+          "type": "string",
+          "title": "温度"
+        },
+        "state": {
+          "type": "string",
+          "title": "状态"
+        }
       }
-    }
   },
-  "fsm": {
-    "states": ["a","b","c"],
-    "startWith": "a",
-    "transitions": [
-      {
-        "event": "AtoB",
-        "from": "a",
-        "to": "b",
-        "action": "update${_id}(_id:${_id},data:{})"
-      },
-      {
-        "event": "BtoC",
-        "from": "b",
-        "to": "c"
+    "fsm": {
+      "states": ["on","off"],
+      "startWith": "off",
+      "transitions": [
+        {
+          "event": "turn_on",
+          "from": "off",
+          "to": "on"
+        },
+        {
+          "event": "update_temp",
+          "from": "on",
+          "to": "on"
+        }
+      ]
+  }
+},
+  "airPurifier": {
+    "fieldschema": {
+      "type": "object",
+      "nodeType": "AirPurifier",
+      "properties": {
+        "purifierId": {
+          "title": "编号",
+          "type": "string"
+        },
+        "speed": {
+          "type": "string",
+          "title": "速度"
+        },
+        "isRunning": {
+          "type": "string",
+          "title": "是否工作"
+        },
+        "state": {
+          "type": "string",
+          "title": "状态"
+        }
       }
-    ]
-  },
-  "event": {
-    "eventName": "AtoB",
-    "nodeType": "tempSenor",
-    "id": "12345",
-    "data": {
-      "temp": "\"15\""
+    },
+    "fsm": {
+      "states": ["off","on","low_speed","high_speed"],
+      "startWith": "off",
+      "transitions": [
+        {
+          "event": "turn_on",
+          "from": "off",
+          "to": "on"
+        },
+        {
+          "event": "speed_up",
+          "from": "*/off",
+          "to": "high_speed"
+        },
+        {
+          "event": "low_speed",
+          "from": "*/off",
+          "to": "low_speed"
+        },
+        {
+          "event": "turn_off",
+          "from": "*",
+          "to": "off"
+        }
+      ]
     }
   }
 }
