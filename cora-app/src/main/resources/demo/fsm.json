@@ -1,7 +1,7 @@
 {
-  "tempSenor": {
+  "fieldschema": {
     "type": "object",
-    "nodeType": "tempSenor",
+    "nodeType": "TempSenor",
     "properties": {
       "lightId": {
         "title": "编号",
@@ -10,49 +10,38 @@
       "temp": {
         "type": "string",
         "title": "温度"
+      },
+      "state": {
+        "type": "string",
+        "title": "状态"
       }
-    },
-    "fsm": {
-      "states": ["a","b","c"],
-      "startWith": "a",
-      "transitions": [
-        {
-          "event": "AtoB",
-          "from": "a",
-          "to": "b",
-          "action": "update${_id}(_id:${_id},data:{})"
-        },
-        {
-          "event": "BtoC",
-          "from": "b",
-          "to": "c"
-        }
-      ]
     }
   },
-
-
+  "fsm": {
+    "states": ["a","b","c"],
+    "startWith": "a",
+    "transitions": [
+      {
+        "event": "AtoB",
+        "from": "a",
+        "to": "b",
+        "action": "update${_id}(_id:${_id},data:{})"
+      },
+      {
+        "event": "BtoC",
+        "from": "b",
+        "to": "c"
+      }
+    ]
+  },
   "event": {
     "eventName": "AtoB",
     "nodeType": "tempSenor",
     "id": "12345",
     "data": {
-      "temp": "15"
-    }
-  },
-
-
-
-  "eventflow": {
-    "startWith": {
-      "eventName": "BtoC",
-      "eventType": "mutation",
-      "operation": "xxx"
-    },
-    "then": {
-      "eventName": "open_door",
-      "eventType": "stay/new/remove",
-      "operation": "update_door(_id:xxx){...}"
+      "temp": "\"15\""
     }
   }
 }
+
+

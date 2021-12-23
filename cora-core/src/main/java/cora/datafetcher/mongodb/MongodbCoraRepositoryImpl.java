@@ -1,12 +1,14 @@
 package cora.datafetcher.mongodb;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mongodb.client.result.UpdateResult;
 import cora.datafetcher.CoraRepository;
 import cora.parser.JsonAST;
 import cora.parser.sql.MongodbQueryFilterParser;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +71,14 @@ public class MongodbCoraRepositoryImpl implements CoraRepository<JSONObject> {
 
     @Override
     public JSONObject updateNodeInstance(String nodeType, String id, JSONObject data) {
-        return null;
+        Query query = new Query();
+        query.addCriteria(Criteria.where("nodeType").is(nodeType));
+        query.addCriteria(Criteria.where("_id").is(id));
+        Update update = new Update();
+        for(String key:data.getInnerMap().keySet()){
+            update.set(key,data.getInnerMap().get(key));
+        }
+        JSONObject result = mongoTemplate.findAndModify(query, update, JSONObject.class, collectionName);
+        return result;
     }
 }

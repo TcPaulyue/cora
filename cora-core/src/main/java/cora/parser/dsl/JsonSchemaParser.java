@@ -1,5 +1,7 @@
 package cora.parser.dsl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
@@ -165,16 +167,15 @@ public class JsonSchemaParser implements CoraParser {
         if(!isValid(eventInput)){
             return null;
         }
-        JsonAST jsonAST = JsonAST.parseJSON(eventInput);
-        if(jsonAST.equals(null))
-            return null;
-        String eventName = jsonAST.getString("eventName");
+        JSONObject jsonObject =  JSON.parseObject(eventInput);
+
+        String eventName = jsonObject.getString("eventName");
         InputEvent event = new InputEvent(eventName);
-        String nodeType = jsonAST.getString("nodeType");
+        String nodeType = jsonObject.getString("nodeType");
         event.setNodeType(nodeType);
-        String id = jsonAST.getString("id");
+        String id = jsonObject.getString("id");
         event.setId(id);
-        Map<String,Object> data = jsonAST.getJSONAST("data").getMap();
+        Map<String, Object> data = jsonObject.getJSONObject("data").getInnerMap();
         event.setData(data);
         return event;
     }

@@ -1,10 +1,10 @@
 package cora.web;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import cora.CoraBuilder;
+import cora.graph.fsm.impl.StateImpl;
+import cora.stateengine.StateEngine;
 import cora.util.ServletUtil;
-import graphql.ExecutionResult;
 import graphql.GraphQL;
 
 import javax.servlet.ServletException;
@@ -16,15 +16,17 @@ import java.io.IOException;
 //graphql api impl
 public class CoraQLServlet extends HttpServlet {
 
+    private StateEngine stateEngine;
+
     private GraphQL graphQL;
 
     private final CoraBuilder coraBuilder;
 
-    public CoraQLServlet(CoraBuilder coraBuilder) {
+    public CoraQLServlet(StateEngine stateEngine, CoraBuilder coraBuilder) {
+        this.stateEngine = stateEngine;
         this.coraBuilder = coraBuilder;
         this.graphQL = coraBuilder.createGraphQL();
     }
-    
     @Override
     public void init() throws ServletException {
         super.init();
@@ -45,16 +47,17 @@ public class CoraQLServlet extends HttpServlet {
             JSONObject schemas = coraBuilder.getSchemas();
             response.getWriter().write(schemas.toJSONString());
         }else if(schema.contains("create_api")){
-            this.graphQL = coraBuilder.addCustomIngress(schema);
+            graphQL = coraBuilder.addCustomIngress(schema);
             response.getWriter().write("add new ingress.");
         }else if(schema.contains("query_flowDefinitions")){
             JSONObject flows = coraBuilder.getFlows();
             response.getWriter().write(flows.toJSONString());
         }else{
-            ExecutionResult result = graphQL.execute(schema);
-            if (result.getErrors().isEmpty())
-                response.getWriter().write(JSON.toJSONString(result.getData()));
-            else response.getWriter().write(JSON.toJSONString(result.getErrors()));
+            StateImpl state = (StateImpl) stateEngine.execute(schema);
+            String result = state.getExecutionResult();
+            if (result.isEmpty())
+                response.getWriter().write(result);
+            else response.getWriter().write(result);
         }
 
 

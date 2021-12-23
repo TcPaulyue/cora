@@ -1,5 +1,7 @@
 package cora.util;
 
+import java.util.Map;
+
 public class StringUtil {
     public static String lowerCase(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
@@ -9,6 +11,16 @@ public class StringUtil {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static String merge(String str1, Map<String,Object> map){
+        StringBuilder sb = new StringBuilder();
+        int first = str1.indexOf("state");
+        sb.append(str1.substring(0,first));
+        for(String key:map.keySet()){
+            sb.append(key).append(":").append(map.get(key).toString()).append(",").append("\n");
+        }
+        sb.append(str1.substring(first));
+        return sb.toString();
+    }
     //merge two string
     public static String merge(String str1,String str2){
         int left1 = 0;

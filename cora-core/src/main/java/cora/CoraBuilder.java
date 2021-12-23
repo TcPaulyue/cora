@@ -119,7 +119,7 @@ public class CoraBuilder {
             String nodeName = CoraGraph.merge(parse);
             this.addNewTypeAndDataFetcherInGraphQL(CoraGraph.getCoraNode(nodeName));
             //fsm
-            if(!coraNode.getJSONObject("schemaDefinition").getString("fsm").isEmpty()){
+            if(coraNode.getJSONObject("schemaDefinition").getString("fsm")!= null){
                 FSM fsm = coraParser.parseFSM(coraNode.getJSONObject("schemaDefinition").getString("fsm"));
                 CoraGraph.addFsm(nodeName,fsm);
             }

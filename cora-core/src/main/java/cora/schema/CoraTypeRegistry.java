@@ -81,6 +81,7 @@ public class CoraTypeRegistry {
 
             this.addCreateNodeInstanceInQuery(coraNode.getName(), coraNode.getInputTypeMap());
 
+            this.addUpdateNodeInstanceInQuery(coraNode.getName(),coraNode.getInputTypeMap());
         }
     }
 
@@ -126,6 +127,15 @@ public class CoraTypeRegistry {
                 , inputValueDefinition);
     }
 
+    private void addUpdateNodeInstanceInQuery(String name,Map<String,Type> typeMap){
+        List<InputValueDefinition> inputValueDefinitions = new ArrayList<>();
+        inputValueDefinitions.add(new InputValueDefinition("_id", new TypeName("String")));
+        inputValueDefinitions.add(new InputValueDefinition("data", new TypeName(GQLTemplate.inputTypeForNodeInstance(name))));
+
+        this.addFieldDefinitionsInQueryType(GQLTemplate.updateNodeInstance(name)
+                , new TypeName(name)
+                , inputValueDefinitions);
+    }
 
     void addInputObjectTypeDefinition(String name, Map<String, Type> typeMap) {
 

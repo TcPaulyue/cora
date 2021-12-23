@@ -16,6 +16,8 @@ import cora.util.StringUtil;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 
+import java.util.LinkedHashMap;
+
 public class StateEngineImpl implements StateEngine {
     private CoraParser coraParser;
 
@@ -48,10 +50,9 @@ public class StateEngineImpl implements StateEngine {
 
         //if event trigger
         StateImpl nextState = (StateImpl) this.getNextState(state,event);
-
         //merge string
         String updateState = IngressTemplate.getUpdateStateTemplate(event.getNodeType(),event.getId(),nextState.getStateDesc());
-        String merge = StringUtil.merge(input, updateState);
+        String merge = StringUtil.merge( updateState,event.getData());
 
         ExecutionResult executeResult = graphQL.execute(merge);
         String s = JSON.toJSONString(executeResult.getData());
@@ -68,8 +69,13 @@ public class StateEngineImpl implements StateEngine {
         String queryState = IngressTemplate.getQueryStateTemplate(nodeType, id);
         ExecutionResult executeResult = graphQL.execute(queryState);
         if(executeResult.getErrors().isEmpty()){
-            JSONObject jsonObject = JSON.parseObject(executeResult.getData());
-            String state = jsonObject.getString("state");
+            LinkedHashMap<String,Object> data = executeResult.getData();
+            JSONObject jsonObject = new JSONObject(executeResult.getData());
+            String state = null;
+            for(String key:jsonObject.keySet()){
+                state = jsonObject.getJSONObject(key).getString("state");
+                break;
+            }
             return new StateImpl(state);
         }
         return null;

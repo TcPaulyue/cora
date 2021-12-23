@@ -14,7 +14,7 @@ public class IngressTemplate {
 
     private static final String queryStateTemplate = "{query_${nodeType}(_id:\"${id}\"){state}}";
 
-    private static final String updateStateTemplate = "{update_${nodeType}(_id:\"${id}\",data:{state:${state}}){state}}";
+    private static final String updateStateTemplate = "{update_${nodeType}(_id:\"${id}\",data:{state:\"${state}\"}){state}}";
 
     public static String getUpdateStateTemplate(String nodeType,String id,String state){
         Map<String,String> map = new HashMap<>();

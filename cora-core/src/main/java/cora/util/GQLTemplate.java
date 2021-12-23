@@ -37,6 +37,10 @@ public class GQLTemplate {
     private static final String CREATE_NODE_INSTANCE_PRE = "create_";
     private static final String CREATE_NODE_INSTANCE_SUFFIX = "";
 
+    //update node instance
+    private static final String UPDATE_NODE_INSTANCE_PRE = "update_";
+    private static final String UPDATE_NODE_INSTANCE_SUFFIX = "";
+
     private static final String FILTER_NODE_INSTANCE_PRE = "filters_of_";
     private static final String FILTER_NODE_INSTANCE_SUFFIX = "";
 
@@ -50,6 +54,10 @@ public class GQLTemplate {
 
     public static String queryInstanceList(String graphNodeName) {
         return QUERY_INSTANCE_LIST_PRE + StringUtil.lowerCase(graphNodeName) + QUERY_INSTANCE_LIST_SUFFIX;
+    }
+
+    public static String updateNodeInstance(String graphNodeName){
+        return UPDATE_NODE_INSTANCE_PRE + StringUtil.lowerCase(graphNodeName) + UPDATE_NODE_INSTANCE_SUFFIX;
     }
 
     public static String createNodeInstance(String graphNodeName) {

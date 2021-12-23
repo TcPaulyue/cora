@@ -9,4 +9,5 @@ public interface CoraStorage<T> {
     DataFetcher<List<T>> getListFetcher();
     DataFetcher<T> getCreator();
     DataFetcher<T> getRemover();
+    DataFetcher<T> getUpdater();
 }

@@ -109,4 +109,15 @@ public class CoraStorageImp implements CoraStorage<JSONObject> {
     public DataFetcher<JSONObject> getRemover() {
         return null;
     }
+
+    @Override
+    public DataFetcher<JSONObject> getUpdater() {
+        return dataFetcherEnvironment ->{
+            JSONObject content = new JSONObject(dataFetcherEnvironment.getArgument("data"));
+            String id = dataFetcherEnvironment.getArgument("_id");
+            String nodeType = ((GraphQLObjectType) dataFetcherEnvironment.getFieldType()).getName();
+            this.removeCache(nodeType);
+            return coraRepository.updateNodeInstance(nodeType,id,content);
+        };
+    }
 }

@@ -14,11 +14,13 @@ import java.util.Map;
 public class CoraRuntimeWiring {
     private RuntimeWiring runtimeWiring;
 
-    DataFetcher mongodbNodeInstanceFetcher;
+    DataFetcher nodeInstanceFetcher;
 
-    DataFetcher mongodbNodeInstanceListFetcher;
+    DataFetcher nodeInstanceListFetcher;
 
-    DataFetcher mongodbNodeInstanceConstructor;
+    DataFetcher nodeInstanceConstructor;
+
+    DataFetcher nodeInstanceUpdater;
 
     private static final String QUERY_IN_GRAPHQL = "Query";
 
@@ -27,13 +29,15 @@ public class CoraRuntimeWiring {
     public CoraRuntimeWiring(){
     }
 
-    public CoraRuntimeWiring(DataFetcher mongodbNodeInstanceFetcher
-            , DataFetcher mongodbNodeInstanceListFetcher
-            , DataFetcher mongodbNodeInstanceConstructor) {
+    public CoraRuntimeWiring(DataFetcher nodeInstanceFetcher
+            , DataFetcher nodeInstanceListFetcher
+            , DataFetcher nodeInstanceConstructor
+            , DataFetcher nodeInstanceUpdater) {
         runtimeWiring = RuntimeWiring.newRuntimeWiring().build();
-        this.mongodbNodeInstanceFetcher = mongodbNodeInstanceFetcher;
-        this.mongodbNodeInstanceListFetcher = mongodbNodeInstanceListFetcher;
-        this.mongodbNodeInstanceConstructor = mongodbNodeInstanceConstructor;
+        this.nodeInstanceFetcher = nodeInstanceFetcher;
+        this.nodeInstanceListFetcher = nodeInstanceListFetcher;
+        this.nodeInstanceConstructor = nodeInstanceConstructor;
+        this.nodeInstanceUpdater = nodeInstanceUpdater;
     }
 
 
@@ -60,20 +64,22 @@ public class CoraRuntimeWiring {
         //queryDocument ==>  documentDataFetcher
         // RelationalDataFetcher relationalDataFetcher = new RelationalDataFetcher(connection);
         // this.addNewEntryInQueryDataFetcher(graphNode.getName(), relationalDataFetcher);
-        this.addCoraDataFetcherInCoraIngress(GQLTemplate.querySingleInstance(coraNode.getName()),mongodbNodeInstanceFetcher);
+        this.addCoraDataFetcherInCoraIngress(GQLTemplate.querySingleInstance(coraNode.getName()),nodeInstanceFetcher);
 
-        this.addCoraDataFetcherInCoraIngress(GQLTemplate.queryInstanceList(coraNode.getName()),mongodbNodeInstanceListFetcher);
+        this.addCoraDataFetcherInCoraIngress(GQLTemplate.queryInstanceList(coraNode.getName()),nodeInstanceListFetcher);
 
-        this.addCoraDataFetcherInCoraIngress(GQLTemplate.createNodeInstance(coraNode.getName()),mongodbNodeInstanceConstructor);
+        this.addCoraDataFetcherInCoraIngress(GQLTemplate.createNodeInstance(coraNode.getName()),nodeInstanceConstructor);
+
+        this.addCoraDataFetcherInCoraIngress(GQLTemplate.updateNodeInstance(coraNode.getName()),nodeInstanceUpdater);
 
         if(!coraNode.getLinkedTypeMap().isEmpty()){
             Map<String,DataFetcher> dataFetcherMap = new HashMap<>();
             coraNode.getLinkedTypeMap().keySet().forEach(field->{
                 Type nodeInstanceType = coraNode.getLinkedTypeMap().get(field);
                 if(nodeInstanceType instanceof ListType){
-                    dataFetcherMap.put(field,mongodbNodeInstanceListFetcher);
+                    dataFetcherMap.put(field,nodeInstanceListFetcher);
                 }else{
-                    dataFetcherMap.put(field,mongodbNodeInstanceFetcher);
+                    dataFetcherMap.put(field,nodeInstanceFetcher);
                 }
             });
             this.addCoraDataFetchersInCoraNode(coraNode.getName(),dataFetcherMap);

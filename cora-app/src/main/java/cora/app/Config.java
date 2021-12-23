@@ -2,10 +2,11 @@ package cora.app;
 
 import com.alibaba.fastjson.JSONObject;
 import cora.CoraBuilder;
-import cora.datafetcher.relational.RelationalCoraRepositoryImpl;
 import cora.groovy.GroovyScriptService;
 import cora.groovy.GroovyScriptTemplate;
 import cora.groovy.impl.CustomCoraRepoFactory;
+import cora.stateengine.StateEngine;
+import cora.stateengine.impl.StateEngineImpl;
 import cora.web.CoraQLServlet;
 import cora.web.K8sServlet;
 import cora.web.RestApiServlet;
@@ -80,10 +81,13 @@ public class Config {
     }
 
     @Bean
+    public DataFetcher<JSONObject> coraNodeInstanceUpdater(){return coraMongodb().getUpdater();}
+    @Bean
     public CoraRuntimeWiring coraRuntimeWiring() {
         return new CoraRuntimeWiring(coraNodeInstanceFetcher()
                 , coraNodeInstanceListFetcher()
-                , coraNodeInstanceConstructor());
+                , coraNodeInstanceConstructor()
+                , coraNodeInstanceUpdater());
     }
 
     @Bean
@@ -108,13 +112,18 @@ public class Config {
     }
 
     @Bean
+    public StateEngine stateEngine(){
+        return new StateEngineImpl(coraParser(),coraBuilder());
+    }
+
+    @Bean
     public Servlet restServlet() {
         return new RestApiServlet(coraBuilder());
     }
 
     @Bean
     public Servlet graphqlServlet() {
-        return new CoraQLServlet(coraBuilder());
+        return new CoraQLServlet(stateEngine(),coraBuilder());
     }
 
     @Bean
