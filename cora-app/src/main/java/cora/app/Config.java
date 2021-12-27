@@ -18,6 +18,7 @@ import cora.parser.dsl.CoraParser;
 import cora.parser.dsl.JsonSchemaParser;
 import cora.schema.CoraRuntimeWiring;
 import cora.schema.CoraTypeRegistry;
+import graphql.GraphQL;
 import graphql.schema.DataFetcher;
 import groovy.lang.GroovyClassLoader;
 import org.eclipse.jetty.server.Connector;
@@ -112,18 +113,23 @@ public class Config {
     }
 
     @Bean
+    public GraphQL graphQL(){
+        return coraBuilder().createGraphQL();
+    }
+
+    @Bean
     public StateEngine stateEngine(){
-        return new StateEngineImpl(coraParser(),coraBuilder());
+        return new StateEngineImpl(coraParser(),graphQL());
     }
 
     @Bean
     public Servlet restServlet() {
-        return new RestApiServlet(coraBuilder());
+        return new RestApiServlet(coraBuilder(),graphQL());
     }
 
     @Bean
     public Servlet graphqlServlet() {
-        return new CoraQLServlet(stateEngine(),coraBuilder());
+        return new CoraQLServlet(stateEngine(),coraBuilder(),graphQL());
     }
 
     @Bean

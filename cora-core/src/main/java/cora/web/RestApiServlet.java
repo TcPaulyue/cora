@@ -26,9 +26,9 @@ public class RestApiServlet extends HttpServlet {
 
     private final CoraBuilder coraBuilder;
 
-    public RestApiServlet(CoraBuilder coraBuilder) {
+    public RestApiServlet(CoraBuilder coraBuilder,GraphQL graphQL) {
         this.coraBuilder = coraBuilder;
-        this.graphQL = coraBuilder.createGraphQL();
+        this.graphQL = graphQL;
     }
 
     @Override

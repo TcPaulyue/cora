@@ -16,16 +16,16 @@ import java.io.IOException;
 //graphql api impl
 public class CoraQLServlet extends HttpServlet {
 
-    private StateEngine stateEngine;
+    private final StateEngine stateEngine;
 
     private GraphQL graphQL;
 
     private final CoraBuilder coraBuilder;
 
-    public CoraQLServlet(StateEngine stateEngine, CoraBuilder coraBuilder) {
+    public CoraQLServlet(StateEngine stateEngine, CoraBuilder coraBuilder,GraphQL graphQL) {
         this.stateEngine = stateEngine;
         this.coraBuilder = coraBuilder;
-        this.graphQL = coraBuilder.createGraphQL();
+        this.graphQL = graphQL;
     }
     @Override
     public void init() throws ServletException {
@@ -47,7 +47,7 @@ public class CoraQLServlet extends HttpServlet {
             JSONObject schemas = coraBuilder.getSchemas();
             response.getWriter().write(schemas.toJSONString());
         }else if(schema.contains("create_api")){
-            graphQL = coraBuilder.addCustomIngress(schema);
+            this.graphQL = coraBuilder.addCustomIngress(schema);
             response.getWriter().write("add new ingress.");
         }else if(schema.contains("query_flowDefinitions")){
             JSONObject flows = coraBuilder.getFlows();

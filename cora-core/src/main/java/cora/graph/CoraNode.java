@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import cora.graph.coraCache.CacheElement;
 import cora.graph.coraCache.CacheKey;
 import cora.graph.fsm.FSM;
-import cora.graph.fsm.impl.FSMImpl;
 import graphql.language.*;
 
 import java.util.ArrayList;

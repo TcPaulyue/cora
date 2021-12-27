@@ -2,7 +2,6 @@ package cora.stateengine.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import cora.CoraBuilder;
 import cora.graph.CoraGraph;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.State;
@@ -16,48 +15,57 @@ import cora.util.StringUtil;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 
-import java.util.LinkedHashMap;
-
 public class StateEngineImpl implements StateEngine {
     private CoraParser coraParser;
 
-    private GraphQL graphQL;
+    private final GraphQL graphQL;
 
-    private final CoraBuilder coraBuilder;
-
-    public StateEngineImpl(CoraParser coraParser, CoraBuilder coraBuilder) {
+    public StateEngineImpl(CoraParser coraParser, GraphQL graphQL) {
         this.coraParser = coraParser;
-        this.coraBuilder = coraBuilder;
-        this.graphQL = coraBuilder.createGraphQL();
+        this.graphQL = graphQL;
     }
 
     @Override
     public State execute(String input) {
+        //todo
         JsonSchemaParser jsonSchemaParser = new JsonSchemaParser();
         InputEvent event = (InputEvent) jsonSchemaParser.parseEvent(input);
 
         //if no event in query
         if(event == null){
             ExecutionResult executeResult = graphQL.execute(input);
-            String s = JSON.toJSONString(executeResult.getData());
+            String s;
+            if(executeResult.getErrors().isEmpty())
+                s = JSON.toJSONString(executeResult.getData());
+            else s = JSON.toJSONString(executeResult.getErrors());
+
             StateImpl state = new StateImpl(null);
             state.setExecutionResult(s);
             return state;
         }
 
         //getState
-        StateImpl state = (StateImpl) this.getState(event.getNodeType(), event.getId());
+        StateImpl currentState = (StateImpl) this.getState(event.getNodeType(), event.getId());
 
         //if event trigger
-        StateImpl nextState = (StateImpl) this.getNextState(state,event);
+        StateImpl nextState = (StateImpl) this.getNextState(currentState,event);
         //merge string
-        String updateState = IngressTemplate.getUpdateStateTemplate(event.getNodeType(),event.getId(),nextState.getStateDesc());
-        String merge = StringUtil.merge( updateState,event.getData());
+        String updateStateMutation = IngressTemplate.getUpdateStateTemplate(event.getNodeType(),event.getId(),nextState.getStateDesc());
+        String updateMutation = StringUtil.merge( updateStateMutation,event.getData());
 
-        ExecutionResult executeResult = graphQL.execute(merge);
-        String s = JSON.toJSONString(executeResult.getData());
-        nextState.setExecutionResult(s);
+        ExecutionResult executeResult = graphQL.execute(updateMutation);
+        String s;
         //getNextState;
+        if(executeResult.getErrors().isEmpty()){
+            s = JSON.toJSONString(executeResult.getData());
+            nextState.setExecutionResult(s);
+        }
+        //failed
+        else{
+            s = JSON.toJSONString(executeResult.getErrors());
+            nextState.setStateDesc(currentState.getStateDesc());
+            nextState.setExecutionResult(s);
+        }
         return nextState;
     }
 
@@ -69,7 +77,6 @@ public class StateEngineImpl implements StateEngine {
         String queryState = IngressTemplate.getQueryStateTemplate(nodeType, id);
         ExecutionResult executeResult = graphQL.execute(queryState);
         if(executeResult.getErrors().isEmpty()){
-            LinkedHashMap<String,Object> data = executeResult.getData();
             JSONObject jsonObject = new JSONObject(executeResult.getData());
             String state = null;
             for(String key:jsonObject.keySet()){

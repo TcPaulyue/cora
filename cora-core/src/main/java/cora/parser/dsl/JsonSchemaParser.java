@@ -19,10 +19,7 @@ import graphql.language.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.gson.stream.JsonToken.END_DOCUMENT;
 
@@ -146,10 +143,12 @@ public class JsonSchemaParser implements CoraParser {
             return null;
         }
         JsonAST jsonAST = JsonAST.parseJSON(fsmSchema);
+        String startWith = jsonAST.getString("startWith");
+        State initState = new StateImpl(startWith);
         Map<State, Map<Event,State>> fsmMap = new HashMap<>();
         String[] objects = jsonAST.getStringList("states");
         for(String object:objects){
-            State state = new StateImpl(object.split("\"")[1]);
+            State state = new StateImpl(object);
             fsmMap.put(state,new HashMap<>());
         }
         JsonArray transitions = jsonAST.getJsonArray("transitions");
@@ -157,10 +156,13 @@ public class JsonSchemaParser implements CoraParser {
             JsonAST ast = transitions.getJsonAST(i);
             Event event = new InputEvent(ast.getString("event"));
             State nextState = new StateImpl(ast.getString("to"));
-            State state = new StateImpl(ast.getString("from"));
-            fsmMap.get(state).put(event,nextState);
+            String[] froms = ast.getStringList("from");
+            Arrays.stream(froms).forEach(item->{
+                StateImpl state = new StateImpl(item);
+                fsmMap.get(state).put(event,nextState);
+            });
         }
-        return new FSMImpl(fsmMap);
+        return new FSMImpl(fsmMap,initState);
     }
 
     public Event parseEvent(String eventInput){
@@ -204,20 +206,29 @@ public class JsonSchemaParser implements CoraParser {
                 "      }\n" +
                 "    }\n" +
                 "  }";
-        String s1 = "{{\n" +
-                "      \"states\": [\"a\",\"b\",\"c\"],\n" +
-                "      \"startWith\": \"a\",\n" +
+        String s1 = "{\n" +
+                "      \"states\": [\"off\",\"on\",\"low_speed\",\"high_speed\"],\n" +
+                "      \"startWith\": \"off\",\n" +
                 "      \"transitions\": [\n" +
                 "        {\n" +
-                "          \"event\": \"AtoB\",\n" +
-                "          \"from\": \"a\",\n" +
-                "          \"to\": \"b\",\n" +
-                "          \"action\": \"update${_id}(_id:${_id},data:{})\"\n" +
+                "          \"event\": \"turn_on\",\n" +
+                "          \"from\": [\"off\"],\n" +
+                "          \"to\": \"on\"\n" +
                 "        },\n" +
                 "        {\n" +
-                "          \"event\": \"BtoC\",\n" +
-                "          \"from\": \"b\",\n" +
-                "          \"to\": \"c\"\n" +
+                "          \"event\": \"speed_up\",\n" +
+                "          \"from\": [\"on\",\"low_speed\",\"high_speed\"],\n" +
+                "          \"to\": \"high_speed\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"event\": \"low_speed\",\n" +
+                "          \"from\": [\"on\",\"low_speed\",\"high_speed\"],\n" +
+                "          \"to\": \"low_speed\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"event\": \"turn_off\",\n" +
+                "          \"from\": [\"on\",\"low_speed\",\"high_speed\"],\n" +
+                "          \"to\": \"off\"\n" +
                 "        }\n" +
                 "      ]\n" +
                 "    }";

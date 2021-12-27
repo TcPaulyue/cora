@@ -24,12 +24,12 @@
       "transitions": [
         {
           "event": "turn_on",
-          "from": "off",
+          "from": ["off"],
           "to": "on"
         },
         {
           "event": "update_temp",
-          "from": "on",
+          "from": ["on"],
           "to": "on"
         }
       ]
@@ -64,22 +64,22 @@
       "transitions": [
         {
           "event": "turn_on",
-          "from": "off",
+          "from": ["off"],
           "to": "on"
         },
         {
           "event": "speed_up",
-          "from": "*/off",
+          "from": ["on","low_speed","high_speed"],
           "to": "high_speed"
         },
         {
           "event": "low_speed",
-          "from": "*/off",
+          "from": ["on","low_speed","high_speed"],
           "to": "low_speed"
         },
         {
           "event": "turn_off",
-          "from": "*",
+          "from": ["on","low_speed","high_speed"],
           "to": "off"
         }
       ]

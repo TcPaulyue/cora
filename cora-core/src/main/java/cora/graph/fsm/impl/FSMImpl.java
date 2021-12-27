@@ -10,10 +10,20 @@ public class FSMImpl implements FSM {
 
     Map<State,Map<Event,State>> fsmMap;
 
+    private State initState;
+
     public FSMImpl(Map<State, Map<Event, State>> fsmMap) {
         this.fsmMap = fsmMap;
     }
 
+    public FSMImpl(Map<State, Map<Event, State>> fsmMap, State initState) {
+        this.fsmMap = fsmMap;
+        this.initState = initState;
+    }
+
+    public void setInitState(State initState) {
+        this.initState = initState;
+    }
 
     public Map<State, Map<Event, State>> getFsmMap() {
         return fsmMap;
@@ -26,5 +36,10 @@ public class FSMImpl implements FSM {
     @Override
     public State nextState(State state, Event event) {
         return fsmMap.get(state).get(event);
+    }
+
+    @Override
+    public State initState() {
+        return initState;
     }
 }

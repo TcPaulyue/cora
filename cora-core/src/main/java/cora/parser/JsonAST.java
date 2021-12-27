@@ -54,7 +54,11 @@ public class JsonAST {
             map.put(key, newValue);
         }
         String s = (String)map.get(key);
-        return s.substring(1, s.lastIndexOf("]")).split(",");
+        String[] sl = s.substring(1, s.lastIndexOf("]")).split(",");
+        for(int i = 0;i<sl.length;i++){
+            sl[i] = sl[i].split("\"")[1];
+        }
+        return sl;
     }
 
     public int getInt(String key) {
