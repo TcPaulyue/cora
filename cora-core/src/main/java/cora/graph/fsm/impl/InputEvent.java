@@ -14,6 +14,12 @@ public class InputEvent implements Event {
 
     private Map<String,Object> data;
 
+    private boolean isDuration;
+
+    private long duration;
+
+    private Integer priority;
+
     public InputEvent(String eventName) {
         this.eventName = eventName;
     }
@@ -69,5 +75,29 @@ public class InputEvent implements Event {
 
     public void setData(Map<String, Object> data) {
         this.data = data;
+    }
+
+    public boolean isDuration() {
+        return isDuration;
+    }
+
+    public void setDuration(boolean duration) {
+        isDuration = duration;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

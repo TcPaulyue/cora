@@ -1,7 +1,9 @@
 package cora.parser.dsl;
 
 
+import cora.context.Context;
 import cora.graph.CustomIngress;
+import cora.graph.fsm.Event;
 import cora.graph.fsm.FSM;
 import cora.parser.dsl.CoraParser;
 import graphql.language.*;
@@ -19,6 +21,16 @@ public class SDLParser extends Parser implements CoraParser {
 
     @Override
     public FSM parseFSM(String fsm) {
+        return null;
+    }
+
+    @Override
+    public Context parseContext(String context) {
+        return null;
+    }
+
+    @Override
+    public Event parseEvent(String event) {
         return null;
     }
 

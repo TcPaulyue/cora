@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
+import cora.context.Context;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.FSM;
 import cora.graph.fsm.State;
@@ -165,6 +166,13 @@ public class JsonSchemaParser implements CoraParser {
         return new FSMImpl(fsmMap,initState);
     }
 
+    @Override
+    public Context parseContext(String context) {
+        //todo: parse Context
+        return null;
+    }
+
+    @Override
     public Event parseEvent(String eventInput){
         if(!isValid(eventInput)){
             return null;
@@ -179,6 +187,7 @@ public class JsonSchemaParser implements CoraParser {
         event.setId(id);
         Map<String, Object> data = jsonObject.getJSONObject("data").getInnerMap();
         event.setData(data);
+        Boolean isDuration = jsonObject.getBoolean("isDuration");
         return event;
     }
     public static void main(String[] args) {

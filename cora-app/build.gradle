@@ -17,6 +17,7 @@ dependencies {
     implementation 'org.springframework.data:spring-data-mongodb:2.2.5.RELEASE'
     implementation 'com.alibaba:fastjson:1.2.75'
     implementation 'org.codehaus.groovy:groovy-all:2.5.7'
+    implementation group: 'com.google.guava', name: 'guava', version: '11.0.2'
     implementation project(':cora-core')
 }
 

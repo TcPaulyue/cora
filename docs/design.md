@@ -13,7 +13,7 @@
   + graphql & restful api(curd)
   + custom ingress
 
-#### parser
+#### parser(antlr)
 + parser for json-schema & sdl
 
 
@@ -44,9 +44,11 @@
 + query string cache
   
 + nodeInstance cache
+  + once update,remove all cache
+  + full path cache
 
 #### domain model management
 
-#### auth 
+#### fsm
 
 #### workflow

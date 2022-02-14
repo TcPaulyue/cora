@@ -1,7 +1,9 @@
 package cora.app;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.eventbus.EventBus;
 import cora.CoraBuilder;
+import cora.context.ContextHandler;
 import cora.groovy.GroovyScriptService;
 import cora.groovy.GroovyScriptTemplate;
 import cora.groovy.impl.CustomCoraRepoFactory;
@@ -123,13 +125,25 @@ public class Config {
     }
 
     @Bean
+    public ContextHandler contextHandler(){
+        return new ContextHandler(coraParser(),stateEngine());
+    }
+
+    @Bean
+    public EventBus eventBus(){
+        EventBus eventBus = new EventBus();
+        eventBus.register(contextHandler());
+        return eventBus;
+    }
+
+    @Bean
     public Servlet restServlet() {
         return new RestApiServlet(coraBuilder(),graphQL());
     }
 
     @Bean
     public Servlet graphqlServlet() {
-        return new CoraQLServlet(stateEngine(),coraBuilder(),graphQL());
+        return new CoraQLServlet(stateEngine(),coraBuilder(),graphQL(), contextHandler());
     }
 
     @Bean

@@ -1,7 +1,6 @@
 package cora.graph;
 
 import cora.graph.fsm.FSM;
-import cora.parser.dsl.CoraParser;
 import graphql.language.Definition;
 import graphql.language.ObjectTypeDefinition;
 

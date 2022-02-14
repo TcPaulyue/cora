@@ -20,6 +20,7 @@ public class StateEngineImpl implements StateEngine {
 
     private final GraphQL graphQL;
 
+
     public StateEngineImpl(CoraParser coraParser, GraphQL graphQL) {
         this.coraParser = coraParser;
         this.graphQL = graphQL;
@@ -29,7 +30,7 @@ public class StateEngineImpl implements StateEngine {
     public State execute(String input) {
         //todo
         JsonSchemaParser jsonSchemaParser = new JsonSchemaParser();
-        InputEvent event = (InputEvent) jsonSchemaParser.parseEvent(input);
+        Event event = jsonSchemaParser.parseEvent(input);
 
         //if no event in query
         if(event == null){
@@ -43,10 +44,13 @@ public class StateEngineImpl implements StateEngine {
             state.setExecutionResult(s);
             return state;
         }
+        return this.execute(event);
+    }
 
+    @Override
+    public State execute(Event event) {
         //getState
         StateImpl currentState = (StateImpl) this.getState(event.getNodeType(), event.getId());
-
         //if event trigger
         StateImpl nextState = (StateImpl) this.getNextState(currentState,event);
         //merge string
@@ -58,19 +62,18 @@ public class StateEngineImpl implements StateEngine {
         //getNextState;
         if(executeResult.getErrors().isEmpty()){
             s = JSON.toJSONString(executeResult.getData());
-            nextState.setExecutionResult(s);
         }
         //failed
         else{
             s = JSON.toJSONString(executeResult.getErrors());
             nextState.setStateDesc(currentState.getStateDesc());
-            nextState.setExecutionResult(s);
         }
+        nextState.setExecutionResult(s);
         return nextState;
     }
 
     public State getNextState(State state, Event event) {
-        return CoraGraph.getCoraNode(((InputEvent)event).getNodeType()).getFsm().nextState(state, event);
+        return CoraGraph.getCoraNode((event).getNodeType()).getFsm().nextState(state, event);
     }
 
     public State getState(String nodeType,String id) {
