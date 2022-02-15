@@ -1,0 +1,21 @@
+{
+  "event": {
+    "eventName": "TempSensor/${id}/update_temp",
+    "data": {
+      "temp": "${temp}"
+    }
+  },
+  "event": {
+    "eventName": "AirPurifier/${id}/speed_up",
+    "duration": "1000",
+    "data": {
+      "speed": "${speed}"
+    }
+  },
+  "event": {
+    "eventName": "AirPurifier/${id}/turn_off_airPurifier",
+    "data": {
+      "isRunning": "${isRunning}"
+    }
+  }
+}

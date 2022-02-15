@@ -1,4 +1,5 @@
 {
+  "contextId": "context01",
   "contextName": "demoContext",
   "instances": ["TempSensor/instanceId01","AirPurifier/instanceId01"],
   "onEvents": {

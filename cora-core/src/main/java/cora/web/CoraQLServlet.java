@@ -60,6 +60,10 @@ public class CoraQLServlet extends HttpServlet {
         }else if(schema.contains("create_context")){
             boolean b = contextHandler.addContext(schema);
             response.getWriter().write("add new Context "+b);
+        }else if(schema.contains("input_event")){
+            //todo
+            contextHandler.deliverEvent(schema);
+            response.getWriter().write("input_event");
         }else{
             StateImpl state = (StateImpl) stateEngine.execute(schema);
             String result = state.getExecutionResult();

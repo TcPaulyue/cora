@@ -1,11 +1,13 @@
 package cora.parser.dsl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.MalformedJsonException;
 import cora.context.Context;
+import cora.context.ContextEvent;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.FSM;
 import cora.graph.fsm.State;
@@ -16,6 +18,8 @@ import cora.parser.JsonAST;
 import cora.parser.JsonArray;
 import cora.util.StringUtil;
 import graphql.language.*;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -167,9 +171,33 @@ public class JsonSchemaParser implements CoraParser {
     }
 
     @Override
-    public Context parseContext(String context) {
+    public Context parseContext(String contextInput) {
         //todo: parse Context
-        return null;
+        if(!isValid(contextInput)){
+            return null;
+        }
+        JSONObject jsonObject =  JSON.parseObject(contextInput).getJSONObject("create_context");
+        String contextId = jsonObject.getString("contextId");
+        String contextName = jsonObject.getString("contextName");
+        List<String> instances = JSON.parseArray(jsonObject.getString("instances"),String.class);
+        Map<String,Map<Pair<String,String>, ContextEvent>> parsedOnEvents = new HashMap<>();
+        Map<String, Object> onEvents = jsonObject.getJSONObject("onEvents").getInnerMap();
+        onEvents.keySet().forEach(id->{
+            HashMap<Pair<String,String>,ContextEvent> map = new HashMap<>();
+            List<JSONObject> jsonObjects = JSON.parseArray(onEvents.get(id).toString(), JSONObject.class);
+            jsonObjects.forEach(jsonObject1 -> {
+                String hook = jsonObject1.getString("hook");
+                String[] split = hook.split("->");
+                Pair<String,String> parsedHook = new ImmutablePair<>(split[0],split[1]);
+                String trigger = jsonObject1.getString("trigger");
+                String action = jsonObject1.getJSONObject("action").getString("publishEvent");
+                map.put(parsedHook,new ContextEvent(parsedHook,trigger,this.parseEvent(action)));
+            });
+            parsedOnEvents.put(id,map);
+        });
+        Context context = new Context(contextId, instances, contextName);
+        context.setOnEvents(parsedOnEvents);
+        return context;
     }
 
     @Override
@@ -188,6 +216,11 @@ public class JsonSchemaParser implements CoraParser {
         Map<String, Object> data = jsonObject.getJSONObject("data").getInnerMap();
         event.setData(data);
         Boolean isDuration = jsonObject.getBoolean("isDuration");
+        event.setDuration(isDuration);
+        if(isDuration){
+            long duration = jsonObject.getInteger("duration");
+            event.setDuration(duration);
+        }
         return event;
     }
     public static void main(String[] args) {
@@ -241,9 +274,32 @@ public class JsonSchemaParser implements CoraParser {
                 "        }\n" +
                 "      ]\n" +
                 "    }";
+
+        String s2 = "{\n" +
+                "  \"contextId\": \"context01\",\n" +
+                "  \"contextName\": \"demoContext\",\n" +
+                "  \"instances\": [\"TempSensor/instanceId01\",\"AirPurifier/instanceId01\"],\n" +
+                "  \"onEvents\": {\n" +
+                "    \"TempSensor/instanceId01\": [\n" +
+                "      {\n" +
+                "        \"hook\": \"on->on\",\n" +
+                "        \"trigger\": \"temp < 22\",\n" +
+                "        \"action\": {\n" +
+                "            \"publishEvent\": {\n" +
+                "              \"eventName\": \"AirPurifier/instanceId01/speed_up\",\n" +
+                "              \"data\": {\n" +
+                "                \"speed\": \"fast\"\n" +
+                "              }\n" +
+                "            }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}";
         JsonSchemaParser jsonSchemaParser = new JsonSchemaParser();
         //List<Definition> definitions = jsonSchemaParser.parseSchema(s);
-        FSM fsm = jsonSchemaParser.parseFSM(s1);
+        //FSM fsm = jsonSchemaParser.parseFSM(s1);
+        Context context = jsonSchemaParser.parseContext(s2);
         System.out.println("definitions");
     }
 }

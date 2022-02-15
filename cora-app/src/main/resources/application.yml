@@ -16,5 +16,5 @@ spring:
 
 cora:
   node:
-    typeCollection: graphNode
-    dataCollection: jieshixin
+    typeCollection: test
+    dataCollection: testData
