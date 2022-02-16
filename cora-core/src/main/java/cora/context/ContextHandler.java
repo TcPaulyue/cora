@@ -4,14 +4,20 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import cora.graph.fsm.Event;
 import cora.graph.fsm.impl.InputEvent;
 import cora.parser.dsl.CoraParser;
 import cora.stateengine.StateEngine;
+import cora.stateengine.impl.StateEngineImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ContextHandler {
+
+    private static Logger logger = LogManager.getLogger(ContextHandler.class);
 
     private static Map<String,Context> contextMap = new HashMap<>();
 
@@ -34,8 +40,10 @@ public class ContextHandler {
 
     public boolean addContext(String schema){
         Context context = coraParser.parseContext(schema);
-        if(context == null)
+        if(context == null){
+            logger.error("[ContextHandler]: coraParser parse Context schema failed");
             return false;
+        }
         EventBus eventBus = new EventBus();
         eventBus.register(this);
         context.init(stateEngine,eventBus);
@@ -49,16 +57,18 @@ public class ContextHandler {
     }
 
     public void deliverEvent(String event){
+        logger.info("[ContextHandler]: deliver event start "+event);
         JSONObject jsonObject = JSON.parseObject(event);
         String contextId = jsonObject.getString("contextId");
         InputEvent parsedEvent = (InputEvent) coraParser.parseEvent(jsonObject.getString("input_event"));
         contextMap.get(contextId).addEvent(parsedEvent.getId(),parsedEvent);
+        logger.info("[ContextHandler]: deliver event end "+event);
     }
 
 
     @Subscribe
     public void handleContextEvent(TriggerEvent triggerEvent){
-        System.out.println(triggerEvent.getId());
+        logger.info("[ContextHandler]: handle trigger event from eventbus start "+triggerEvent.toString());
         contextMap.keySet().forEach(id->{
             ContextEvent contextEvent = contextMap.get(id).getContextEvent(triggerEvent.getId()
                     ,triggerEvent.getFrom(),triggerEvent.getTo());
@@ -68,16 +78,19 @@ public class ContextHandler {
 
             //get trigger situation
             String trigger = contextEvent.getTrigger();
+
             //get actor state
 
             //judge trigger situation
 
             //publish event
-            InputEvent event1 = new InputEvent("event2");
-            event1.setDuration(6000);
-            event1.setDuration(true);
-            event1.setPriority(2);
-            contextMap.get(id).addEvent("1",event1);
+            Event action = contextEvent.getAction();
+
+            logger.info("[ContextHandler]: deliver action event "+triggerEvent.getId());
+            contextMap.get(id).addEvent(action.getId(),action);
+
         });
+        logger.info("[ContextHandler]: handle trigger event from eventbus end "+triggerEvent.toString());
+
     }
 }

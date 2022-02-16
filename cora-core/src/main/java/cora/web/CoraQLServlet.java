@@ -2,7 +2,6 @@ package cora.web;
 
 import com.alibaba.fastjson.JSONObject;
 import cora.CoraBuilder;
-import cora.context.Context;
 import cora.context.ContextHandler;
 import cora.graph.fsm.impl.StateImpl;
 import cora.stateengine.StateEngine;

@@ -5,6 +5,8 @@ import cora.graph.fsm.Event;
 import cora.stateengine.StateEngine;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Context {
+
+    private static Logger logger = LogManager.getLogger(Context.class);
+
     private String contextId;
 
     private String contextName;
@@ -36,7 +41,7 @@ public class Context {
 
     public void init(StateEngine stateEngine, EventBus eventBus){
         actorIds.forEach(id->{
-            actorMap.put(id,new ActorImpl(stateEngine,eventBus));
+            actorMap.put(id,new ActorImpl(id, stateEngine,eventBus));
         });
         this.run();
     }
@@ -44,7 +49,7 @@ public class Context {
     public void run(){
         actorMap.keySet().forEach(id->{
             actorMap.get(id).start();
-            System.out.println("running");
+            logger.info("actor-"+id+" is Running.");
         });
     }
 
@@ -53,6 +58,7 @@ public class Context {
             actorMap.get(id).addEvent(event);
             return true;
         }
+        logger.error("actorMap has no actor that id is "+id);
         return false;
     }
 

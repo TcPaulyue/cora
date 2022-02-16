@@ -5,7 +5,7 @@
   "onEvents": {
     "TempSensor/instanceId01": [
       {
-        "hook": "transaction(on->on)",
+        "hook": "on->on",
         "trigger": "temp < 22",
         "action": {
             "publishEvent": {

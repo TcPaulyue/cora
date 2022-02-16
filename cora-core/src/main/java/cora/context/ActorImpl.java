@@ -4,19 +4,26 @@ import com.google.common.eventbus.EventBus;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.impl.InputEvent;
 import cora.stateengine.StateEngine;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ActorImpl extends Thread implements Actor {
+
+    private String actorId;
+
+    private static Logger logger = LogManager.getLogger(ActorImpl.class);
+
     private static volatile Boolean stopped = false;
 
     private StateEngine stateEngine;
 
     private EventBus eventBus;
 
-
-    public ActorImpl(StateEngine stateEngine,EventBus eventBus) {
+    public ActorImpl(String actorId, StateEngine stateEngine, EventBus eventBus) {
+        this.actorId = actorId;
         this.stateEngine = stateEngine;
         this.eventBus = eventBus;
     }
@@ -36,6 +43,7 @@ public class ActorImpl extends Thread implements Actor {
         while(!stopped){
             InputEvent event = queue.poll();
             if(event!=null){
+                logger.info("actor-"+this.actorId + ": "+"execute event start "+event.getId());
                 if(event.isDuration()){
                     try {
                         Thread.sleep(event.getDuration());
@@ -43,11 +51,16 @@ public class ActorImpl extends Thread implements Actor {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("execute event");
-                //todo: get from to
-                stateEngine.execute(event);
-                eventBus.post(new TriggerEvent(event.getId(),"off","on"));
-                System.out.println("post event");
+                cora.graph.fsm.State state = stateEngine.execute(event);
+                if(state.getFailed()){
+                    logger.error("get state from stateEngine failed "+state.getExecutionResult());
+                    return;
+                }
+                logger.info("event bus publish event "+state.getNodeInstanceId()+" "+state.getPreState()
+                        +" "+state.getCurState());
+                eventBus.post(new TriggerEvent(state.getNodeInstanceId()
+                        ,state.getPreState(),state.getCurState()));
+                logger.info("actor-"+this.actorId +": "+"execute event end "+event.getId());
             }
         }
     }

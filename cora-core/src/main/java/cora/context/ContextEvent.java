@@ -41,4 +41,13 @@ public class ContextEvent {
     public void setAction(Event action) {
         this.action = action;
     }
+
+    @Override
+    public String toString() {
+        return "ContextEvent{" +
+                "hook=" + hook +
+                ", trigger='" + trigger + '\'' +
+                ", action=" + action +
+                '}';
+    }
 }

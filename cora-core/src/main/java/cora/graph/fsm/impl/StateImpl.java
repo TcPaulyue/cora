@@ -5,22 +5,30 @@ import cora.graph.fsm.State;
 import java.util.Objects;
 
 public class StateImpl implements State {
-    private String stateDesc;
+    private String nodeInstanceId;
+
+    private String preState;
+
+    private String curState;
 
     private String executionResult;
 
-    public StateImpl(String stateDesc) {
-        this.stateDesc = stateDesc;
+    private Boolean isFailed;
+
+    public StateImpl(String curState) {
+        this.curState = curState;
     }
 
-    public String getStateDesc() {
-        return stateDesc;
+    @Override
+    public String getCurState() {
+        return curState;
     }
 
-    public void setStateDesc(String stateDesc) {
-        this.stateDesc = stateDesc;
+    public void setCurState(String curState) {
+        this.curState = curState;
     }
 
+    @Override
     public String getExecutionResult() {
         return executionResult;
     }
@@ -30,15 +38,42 @@ public class StateImpl implements State {
     }
 
     @Override
+    public Boolean getFailed() {
+        return isFailed;
+    }
+
+    public void setFailed(Boolean failed) {
+        isFailed = failed;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StateImpl state = (StateImpl) o;
-        return Objects.equals(stateDesc, state.stateDesc);
+        return Objects.equals(curState, state.curState);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(stateDesc);
+        return Objects.hash(curState);
+    }
+
+    @Override
+    public String getNodeInstanceId() {
+        return nodeInstanceId;
+    }
+
+    public void setNodeInstanceId(String nodeInstanceId) {
+        this.nodeInstanceId = nodeInstanceId;
+    }
+
+    @Override
+    public String getPreState() {
+        return preState;
+    }
+
+    public void setPreState(String preState) {
+        this.preState = preState;
     }
 }
