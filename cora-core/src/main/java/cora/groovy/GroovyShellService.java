@@ -4,7 +4,21 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.Eval;
 
+
+import java.util.Map;
+
 public class GroovyShellService {
+
+    public static boolean execute(Map<String,Object> triggerItems, String scriptText){
+        Binding bind = new Binding();
+        triggerItems.keySet().forEach(key->{
+            bind.setVariable(key,triggerItems.get(key));
+        });
+        GroovyShell shell = new GroovyShell(bind);
+        Boolean evaluate = (Boolean) shell.evaluate(scriptText);
+        return evaluate;
+    }
+
     public static void main(String[] args) {
         Binding bind = new Binding();
         bind.setVariable("name", "iamzhongyong");

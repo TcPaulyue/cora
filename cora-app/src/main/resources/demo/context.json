@@ -7,7 +7,7 @@
       {
         "hook": "on->on",
         "triggerItems": ["temp"],
-        "trigger": "temp < 22",
+        "trigger": "temp < '22'",
         "action": {
           "publishEvent": {
             "eventName": "speed_up",
@@ -15,7 +15,7 @@
             "isDuration":false,
             "nodeType":"AirPurifier",
             "data": {
-              "speed": "fast"
+              "speed": "\"fast\""
             }
           }
         }

@@ -1,5 +1,7 @@
 package cora.context;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.eventbus.EventBus;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.impl.InputEvent;
@@ -7,6 +9,9 @@ import cora.stateengine.StateEngine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -58,8 +63,10 @@ public class ActorImpl extends Thread implements Actor {
                 }
                 logger.info("event bus publish event "+state.getNodeInstanceId()+" "+state.getPreState()
                         +" "+state.getCurState());
+                String key = JSON.parseObject(state.getExecutionResult()).keySet().stream().findFirst().get();
+                JSONObject executeResult = JSON.parseObject(state.getExecutionResult()).getJSONObject(key);
                 eventBus.post(new TriggerEvent(state.getNodeInstanceId()
-                        ,state.getPreState(),state.getCurState()));
+                        ,state.getPreState(),state.getCurState(), executeResult));
                 logger.info("actor-"+this.actorId +": "+"execute event end "+event.getId());
             }
         }

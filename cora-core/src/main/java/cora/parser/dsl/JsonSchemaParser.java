@@ -191,7 +191,8 @@ public class JsonSchemaParser implements CoraParser {
                 Pair<String,String> parsedHook = new ImmutablePair<>(split[0],split[1]);
                 String trigger = jsonObject1.getString("trigger");
                 String action = jsonObject1.getJSONObject("action").getString("publishEvent");
-                map.put(parsedHook,new ContextEvent(parsedHook,trigger,this.parseEvent(action)));
+                List<String> triggerItems = JSON.parseArray(jsonObject1.getString("triggerItems"),String.class);
+                map.put(parsedHook,new ContextEvent(parsedHook,triggerItems,trigger,this.parseEvent(action)));
             });
             parsedOnEvents.put(id,map);
         });

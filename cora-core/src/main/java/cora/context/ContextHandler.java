@@ -6,12 +6,15 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import cora.graph.fsm.Event;
 import cora.graph.fsm.impl.InputEvent;
+import cora.groovy.GroovyShellService;
 import cora.parser.dsl.CoraParser;
 import cora.stateengine.StateEngine;
+import cora.util.IngressTemplate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ContextHandler {
@@ -77,9 +80,14 @@ public class ContextHandler {
                 return;
             //todo
             //get context event
-
+            Map<String,Object> triggerItems = new HashMap<>();
+            contextEvent.getTriggerItems().forEach(triggerItem->{
+                triggerItems.put(triggerItem,triggerEvent.getExecuteResult().getString(triggerItem));
+            });
             //get trigger situation
             String trigger = contextEvent.getTrigger();
+
+            boolean execute = GroovyShellService.execute(triggerItems, trigger);
 
             //get actor state
 

@@ -14,13 +14,18 @@ public class IngressTemplate {
 
     private static final String queryStateTemplate = "{query_${nodeType}(_id:\"${id}\"){state}}";
 
-    private static final String updateStateTemplate = "{update_${nodeType}(_id:\"${id}\",data:{state:\"${state}\"}){state}}";
+    private static final String updateStateTemplate = "{update_${nodeType}(_id:\"${id}\",data:{state:\"${state}\"}){${resp}}}";
 
     public static String getUpdateStateTemplate(String nodeType,String id,String state){
         Map<String,String> map = new HashMap<>();
         map.put("nodeType",StringUtil.lowerCase(nodeType));
         map.put("id",id);
         map.put("state",state);
+        StringBuilder sb = new StringBuilder();
+        CoraGraph.CoraNodeMap.get(nodeType).getTypeMap().keySet().forEach(key->{
+            sb.append(key).append("\n");
+        });
+        map.put("resp",sb.toString());
         return VelocityTemplate.build(updateStateTemplate,map);
     }
 
