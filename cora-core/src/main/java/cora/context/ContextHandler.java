@@ -8,7 +8,6 @@ import cora.graph.fsm.Event;
 import cora.graph.fsm.impl.InputEvent;
 import cora.parser.dsl.CoraParser;
 import cora.stateengine.StateEngine;
-import cora.stateengine.impl.StateEngineImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,15 +55,17 @@ public class ContextHandler {
         return true;
     }
 
-    public void deliverEvent(String event){
+    public boolean deliverEvent(String event){
         logger.info("[ContextHandler]: deliver event start "+event);
         JSONObject jsonObject = JSON.parseObject(event);
         String contextId = jsonObject.getString("contextId");
         InputEvent parsedEvent = (InputEvent) coraParser.parseEvent(jsonObject.getString("input_event"));
+        if(parsedEvent == null)
+            return false;
         contextMap.get(contextId).addEvent(parsedEvent.getId(),parsedEvent);
         logger.info("[ContextHandler]: deliver event end "+event);
+        return true;
     }
-
 
     @Subscribe
     public void handleContextEvent(TriggerEvent triggerEvent){
@@ -74,6 +75,7 @@ public class ContextHandler {
                     ,triggerEvent.getFrom(),triggerEvent.getTo());
             if(contextEvent == null)
                 return;
+            //todo
             //get context event
 
             //get trigger situation

@@ -1,26 +1,24 @@
 {
   "contextId": "context01",
   "contextName": "demoContext",
-  "instances": ["TempSensor/instanceId01","AirPurifier/instanceId01"],
+  "instances": ["620b442a862c3f78aea4c847","620b44c6862c3f78aea4c848"],
   "onEvents": {
-    "TempSensor/instanceId01": [
+    "620b442a862c3f78aea4c847": [
       {
         "hook": "on->on",
+        "triggerItems": ["temp"],
         "trigger": "temp < 22",
         "action": {
-            "publishEvent": {
-              "eventName": "AirPurifier/instanceId01/speed_up",
-              "data": {
-                "speed": "fast"
-              }
+          "publishEvent": {
+            "eventName": "speed_up",
+            "id":"620b44c6862c3f78aea4c848",
+            "isDuration":false,
+            "nodeType":"AirPurifier",
+            "data": {
+              "speed": "fast"
             }
+          }
         }
-      }
-    ],
-    "AirPurifier/instanceId01": [
-      {
-        "eventName":"turn_on_airPurifier",
-        "conditions":""
       }
     ]
   }
